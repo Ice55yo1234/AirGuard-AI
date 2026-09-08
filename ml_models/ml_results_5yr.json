@@ -1,0 +1,62 @@
+{
+  "project": "AirGuard AI — Machine Learning PM2.5 Prediction",
+  "dataset_metadata": {
+    "source": "Air4Thai (Pollution Control Department, Thailand)",
+    "period": "2021-2026 (5.5 Years)",
+    "total_records": 2007,
+    "stations_count": 105,
+    "target_station": "Khon Kaen (Station 44t)",
+    "features_count": 106
+  },
+  "benchmark_results": [
+    {
+      "model_name": "Linear Regression",
+      "r2_score": 0.8437,
+      "mae": 5.22,
+      "rmse": 7.41,
+      "training_time_sec": 0.1,
+      "badge": "Baseline (High R²)",
+      "notes": "Fastest training, strong baseline performance"
+    },
+    {
+      "model_name": "Decision Tree",
+      "r2_score": 0.7899,
+      "mae": 6.26,
+      "rmse": 8.59,
+      "training_time_sec": 0.3,
+      "badge": "Interpretable",
+      "notes": "Highly interpretable tree rules"
+    },
+    {
+      "model_name": "Random Forest",
+      "r2_score": 0.8254,
+      "mae": 5.53,
+      "rmse": 7.83,
+      "training_time_sec": 1.8,
+      "badge": "Stable Ensemble",
+      "notes": "Low variance ensemble bagging"
+    },
+    {
+      "model_name": "Gradient Boosting / XGBoost",
+      "r2_score": 0.8209,
+      "mae": 5.44,
+      "rmse": 7.93,
+      "training_time_sec": 1.5,
+      "peak_accuracy": 0.622,
+      "badge": "★ Best Peak Acc (62.2%)",
+      "notes": "Superior capability on high-pollution spikes and peak events"
+    }
+  ],
+  "top_features_importance": [
+    { "feature": "PM2.5 (t-1)", "importance": 0.42 },
+    { "feature": "PM2.5 (t-7)", "importance": 0.18 },
+    { "feature": "Wind Speed", "importance": 0.11 },
+    { "feature": "Relative Humidity", "importance": 0.09 },
+    { "feature": "Temperature", "importance": 0.07 },
+    { "feature": "Month / Season", "importance": 0.05 },
+    { "feature": "PM10", "importance": 0.04 },
+    { "feature": "Station 44t Lag", "importance": 0.02 },
+    { "feature": "Wind Direction", "importance": 0.01 },
+    { "feature": "Day of Year", "importance": 0.01 }
+  ]
+}

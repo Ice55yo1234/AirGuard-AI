@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AirGuard AI — AI Health & Air Intelligence Platform</title>
+  <meta name="description" content="AI-powered PM2.5 prediction, personalized health alerts, and 7-day air quality forecasting for Thailand. Built with XGBoost on 5.5 years of real data.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+</head>
+<body>
+
+  <!-- ===== Loading Screen ===== -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-container">
+      <div class="loader-logo">AirGuard AI</div>
+      <div class="loader-ring"></div>
+      <div class="loader-text">Initializing System...</div>
+    </div>
+  </div>
+
+  <!-- ===== Navigation ===== -->
+  <nav class="navbar" id="navbar">
+    <a href="#" class="nav-brand" onclick="navigateTo('home'); return false;">
+      <div class="nav-brand-icon"><i class="fas fa-wind"></i></div>
+      <span>AirGuard <span class="text-gradient">AI</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" class="active" onclick="navigateTo('home')"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="#alert" onclick="navigateTo('alert')"><i class="fas fa-user-shield"></i> Personalized Alert</a></li>
+      <li><a href="#forecast" onclick="navigateTo('forecast')"><i class="fas fa-calendar-week"></i> 7-Day Forecast</a></li>
+      <li><a href="#benchmark" onclick="navigateTo('benchmark')"><i class="fas fa-flask"></i> ML & Benchmark</a></li>
+      <li><a href="#pricing" onclick="navigateTo('pricing')"><i class="fas fa-building"></i> Enterprise</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button class="mobile-toggle" id="mobileToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ========================================================= -->
+  <!-- ===== HOME PAGE ===== -->
+  <!-- ========================================================= -->
+  <section class="page-section active" id="home">
+    <div class="hero">
+      <div class="hero-bg">
+        <img src="hero-bg.png" alt="Smart City Air Monitoring" loading="eager">
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-particles" id="heroParticles"></div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fas fa-shield-heart"></i>
+          AI Health & Air Intelligence Platform
+        </div>
+        <h1 class="hero-title">
+          Machine Learning-Based<br>
+          <span class="gradient-text">PM2.5 Prediction</span> &<br>
+          Health Risk Alert System
+        </h1>
+        <p class="hero-subtitle">
+          AI-powered air quality prediction with personalized health alerts, 7-day forecasting, and enterprise solutions. 
+          Built on 5.5 years of real data from 105 Air4Thai monitoring stations.
+        </p>
+
+        <!-- ★ Hero Quick Status ★ -->
+        <div class="hero-quick-status" id="heroQuickStatus">
+          <div class="quick-status-header">
+            <span class="live-dot"></span>
+            <span class="quick-status-live">Live Air Quality — Khon Kaen</span>
+          </div>
+          <div class="quick-status-grid">
+            <div class="quick-stat">
+              <div class="quick-stat-icon"><i class="fas fa-smog"></i></div>
+              <div class="quick-stat-value" id="livepm25">--</div>
+              <div class="quick-stat-label">PM2.5 µg/m³</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-stat-icon"><i class="fas fa-temperature-half"></i></div>
+              <div class="quick-stat-value" id="livetemp">--</div>
+              <div class="quick-stat-label">Temperature °C</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-stat-icon"><i class="fas fa-droplet"></i></div>
+              <div class="quick-stat-value" id="livehumidity">--</div>
+              <div class="quick-stat-label">Humidity %</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-stat-icon"><i class="fas fa-wind"></i></div>
+              <div class="quick-stat-value" id="livewind">--</div>
+              <div class="quick-stat-label">Wind km/h</div>
+            </div>
+          </div>
+          <div class="quick-status-action" id="quickStatusAction">
+            <i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...
+          </div>
+        </div>
+
+        <div class="hero-buttons">
+          <a href="#alert" class="btn btn-primary" onclick="navigateTo('alert')">
+            <i class="fas fa-user-shield"></i> Check Your Risk
+          </a>
+          <a href="#forecast" class="btn btn-outline" onclick="navigateTo('forecast')">
+            <i class="fas fa-calendar-week"></i> 7-Day Forecast
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value"><span class="counter-value" data-target="5">0</span>.5</div>
+            <div class="hero-stat-label">Years of Data</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value counter-value" data-target="4">0</div>
+            <div class="hero-stat-label">ML Models</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value"><span class="counter-value" data-target="96">0</span>%</div>
+            <div class="hero-stat-label">Best R² Score</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value counter-value" data-target="105">0</div>
+            <div class="hero-stat-label">Stations</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- ===== PERSONALIZED ALERT PAGE ===== -->
+  <!-- ========================================================= -->
+  <section class="page-section" id="alert">
+    <div class="section-container">
+      <div class="section-header animate-on-scroll">
+        <div class="section-badge"><i class="fas fa-user-shield"></i> Personalized Alert</div>
+        <h2 class="section-title">ตรวจสอบความเสี่ยงเฉพาะบุคคล</h2>
+        <p class="section-subtitle">เลือกกลุ่มของคุณเพื่อรับคำแนะนำด้านสุขภาพที่ตรงจุด ข้อมูลอัปเดตจาก Open-Meteo API แบบ Real-time</p>
+      </div>
+
+      <!-- Current AQ Summary -->
+      <div class="alert-current-aq animate-on-scroll" id="alertCurrentAQ">
+        <div class="current-aq-left">
+          <div class="current-aq-pm25">
+            <div class="current-aq-pm25-value" id="alertPM25Value">--</div>
+            <div class="current-aq-pm25-unit">PM2.5 µg/m³</div>
+          </div>
+          <div class="current-aq-aqi">
+            <div class="current-aq-aqi-label">AQI</div>
+            <div class="current-aq-aqi-value" id="alertAQIValue">--</div>
+          </div>
+        </div>
+        <div class="current-aq-right">
+          <div class="current-aq-meta">
+            <span><i class="fas fa-map-marker-alt"></i> Khon Kaen, Thailand</span>
+            <span><i class="fas fa-clock"></i> <span id="alertUpdateTime">--</span></span>
+          </div>
+          <div class="current-aq-gauge-wrap">
+            <div class="aqi-gauge">
+              <div class="aqi-gauge-marker" id="alertGaugeMarker" style="left: 10%;"></div>
+            </div>
+            <div class="aqi-labels">
+              <span>Good</span>
+              <span>Moderate</span>
+              <span>Unhealthy SG</span>
+              <span>Unhealthy</span>
+              <span>Hazardous</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Risk Filter Buttons -->
+      <div class="risk-filter-container animate-on-scroll">
+        <h3 class="risk-filter-title"><i class="fas fa-users"></i> เลือกกลุ่มของคุณ</h3>
+        <div class="risk-filter-buttons" id="riskFilterButtons">
+          <button class="risk-filter-btn active" data-group="general" onclick="selectRiskGroup('general')">
+            <i class="fas fa-user"></i>
+            <span>ทั่วไป</span>
+            <small>General</small>
+          </button>
+          <button class="risk-filter-btn" data-group="children" onclick="selectRiskGroup('children')">
+            <i class="fas fa-baby"></i>
+            <span>เด็ก / หญิงตั้งครรภ์</span>
+            <small>Children / Pregnant</small>
+          </button>
+          <button class="risk-filter-btn" data-group="elderly" onclick="selectRiskGroup('elderly')">
+            <i class="fas fa-person-cane"></i>
+            <span>ผู้สูงอายุ / ภูมิแพ้</span>
+            <small>Elderly / Allergic</small>
+          </button>
+          <button class="risk-filter-btn" data-group="exercise" onclick="selectRiskGroup('exercise')">
+            <i class="fas fa-person-running"></i>
+            <span>ออกกำลังกาย</span>
+            <small>Outdoor Exercise</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- Health Advisory Box -->
+      <div class="health-advisory animate-on-scroll" id="healthAdvisory">
+        <div class="advisory-header" id="advisoryHeader">
+          <div class="advisory-icon" id="advisoryIcon"><i class="fas fa-spinner fa-spin"></i></div>
+          <div>
+            <div class="advisory-status" id="advisoryStatus">กำลังโหลด...</div>
+            <div class="advisory-subtitle" id="advisorySubtitle">รอข้อมูลจาก API</div>
+          </div>
+        </div>
+        <div class="advisory-body" id="advisoryBody">
+          <div class="advisory-recommendations" id="advisoryRecommendations">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- ===== 7-DAY FORECAST PAGE ===== -->
+  <!-- ========================================================= -->
+  <section class="page-section" id="forecast">
+    <div class="section-container">
+      <div class="section-header animate-on-scroll">
+        <div class="section-badge"><i class="fas fa-calendar-week"></i> 7-Day Forecast</div>
+        <h2 class="section-title">พยากรณ์คุณภาพอากาศ 7 วัน</h2>
+        <p class="section-subtitle">วางแผนกิจกรรมล่วงหน้าด้วยข้อมูลพยากรณ์ PM2.5 จาก Open-Meteo AI</p>
+      </div>
+
+      <!-- 7 Day Cards -->
+      <div class="forecast-cards-grid animate-on-scroll" id="forecastCardsGrid">
+        <!-- Dynamically populated -->
+        <div class="forecast-loading">
+          <i class="fas fa-cloud-sun-rain fa-3x"></i>
+          <p>กำลังโหลดข้อมูลพยากรณ์...</p>
+        </div>
+      </div>
+
+      <!-- Trend Chart -->
+      <div class="chart-card animate-on-scroll" style="margin-top: 32px;">
+        <div class="chart-header">
+          <span class="chart-title"><i class="fas fa-chart-area"></i> PM2.5 Trend — 7 Days</span>
+          <span class="chart-period">Hourly Resolution</span>
+        </div>
+        <div class="chart-container" style="height: 350px;">
+          <canvas id="forecastTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Activity Legend -->
+      <div class="activity-legend animate-on-scroll">
+        <h4><i class="fas fa-icons"></i> สัญลักษณ์กิจกรรม</h4>
+        <div class="legend-items">
+          <div class="legend-item"><span class="legend-icon good">🏃</span> เหมาะกับวิ่ง / ออกกำลังกาย</div>
+          <div class="legend-item"><span class="legend-icon moderate">🚶</span> เหมาะกับเดินเล่น / กิจกรรมเบา</div>
+          <div class="legend-item"><span class="legend-icon sensitive">😷</span> สวมหน้ากากเมื่อออกนอกอาคาร</div>
+          <div class="legend-item"><span class="legend-icon unhealthy">🏠</span> ควรอยู่ในอาคาร</div>
+          <div class="legend-item"><span class="legend-icon hazardous">⚠️</span> อันตราย ห้ามออกนอกบ้าน</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- ===== ML & BENCHMARK PAGE ===== -->
+  <!-- ========================================================= -->
+  <section class="page-section" id="benchmark">
+    <div class="section-container">
+      <div class="section-header animate-on-scroll">
+        <div class="section-badge"><i class="fas fa-flask"></i> ML & Benchmark</div>
+        <h2 class="section-title">Model Performance & Benchmarking</h2>
+        <p class="section-subtitle">เปรียบเทียบประสิทธิภาพ 4 โมเดล Machine Learning ที่ Train จากข้อมูลจริง 5.5 ปี (2021–2026)</p>
+      </div>
+
+      <!-- Dataset Info Cards -->
+      <div class="dataset-info-grid animate-on-scroll">
+        <div class="dataset-info-card">
+          <div class="dataset-info-icon source"><i class="fas fa-satellite-dish"></i></div>
+          <div class="dataset-info-label">Source</div>
+          <div class="dataset-info-value">Air4Thai</div>
+        </div>
+        <div class="dataset-info-card">
+          <div class="dataset-info-icon year"><i class="fas fa-calendar-alt"></i></div>
+          <div class="dataset-info-label">Period</div>
+          <div class="dataset-info-value">2021–2026</div>
+        </div>
+        <div class="dataset-info-card">
+          <div class="dataset-info-icon records"><i class="fas fa-list-ol"></i></div>
+          <div class="dataset-info-label">Records</div>
+          <div class="dataset-info-value counter-value" data-target="2007">0</div>
+        </div>
+        <div class="dataset-info-card">
+          <div class="dataset-info-icon columns"><i class="fas fa-columns"></i></div>
+          <div class="dataset-info-label">Features</div>
+          <div class="dataset-info-value counter-value" data-target="106">0</div>
+        </div>
+        <div class="dataset-info-card">
+          <div class="dataset-info-icon dataset"><i class="fas fa-map-marked-alt"></i></div>
+          <div class="dataset-info-label">Stations</div>
+          <div class="dataset-info-value counter-value" data-target="105">0</div>
+        </div>
+      </div>
+
+      <!-- Model Comparison Table -->
+      <div class="chart-card animate-on-scroll">
+        <div class="chart-header">
+          <span class="chart-title"><i class="fas fa-trophy"></i> Model Performance Comparison</span>
+          <span class="chart-period">4 Models • Test Set</span>
+        </div>
+        <div class="table-container">
+          <table class="data-table benchmark-table" id="benchmarkTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>R² Score</th>
+                <th>MAE</th>
+                <th>RMSE</th>
+                <th>Training Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><i class="fas fa-chart-line" style="color:#42a5f5;margin-right:8px;"></i>Linear Regression</td>
+                <td><strong>0.8437</strong></td>
+                <td><strong>5.22</strong></td>
+                <td><strong>7.41</strong></td>
+                <td>0.1s</td>
+                <td><span class="model-badge baseline">Baseline (High R²)</span></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-code-branch" style="color:#66bb6a;margin-right:8px;"></i>Decision Tree</td>
+                <td>0.7899</td>
+                <td>6.26</td>
+                <td>8.59</td>
+                <td>0.3s</td>
+                <td><span class="model-badge good-m">Interpretable</span></td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-tree" style="color:#ff9800;margin-right:8px;"></i>Random Forest</td>
+                <td>0.8254</td>
+                <td>5.53</td>
+                <td>7.83</td>
+                <td>1.8s</td>
+                <td><span class="model-badge great">Stable Ensemble</span></td>
+              </tr>
+              <tr class="best-model-row">
+                <td><i class="fas fa-bolt" style="color:#00bcd4;margin-right:8px;"></i><strong>Gradient Boosting / XGBoost</strong></td>
+                <td><strong>0.8209</strong></td>
+                <td><strong>5.44</strong></td>
+                <td><strong>7.93</strong></td>
+                <td><strong>1.5s</strong></td>
+                <td><span class="model-badge best">★ Best Peak Acc (62.2%)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-grid" style="margin-top: 28px;">
+        <div class="chart-card animate-on-scroll">
+          <div class="chart-header">
+            <span class="chart-title"><i class="fas fa-chart-bar"></i> Model R² Comparison</span>
+            <span class="chart-period">Higher is Better</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="modelCompareChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card animate-on-scroll">
+          <div class="chart-header">
+            <span class="chart-title"><i class="fas fa-sort-amount-down"></i> Feature Importance (XGBoost)</span>
+            <span class="chart-period">Top 10 Features</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="featureImportanceChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ML Workflow -->
+      <div class="about-card animate-on-scroll" style="margin-top: 28px;">
+        <h3><i class="fas fa-cogs"></i> Machine Learning Pipeline</h3>
+        <div class="workflow-steps">
+          <div class="workflow-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h5>Data Collection</h5>
+              <p>5.5 ปีจาก Air4Thai (105 สถานี, ~2,007 วัน)</p>
+            </div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h5>Preprocessing</h5>
+              <p>จัดการ missing values, normalize features</p>
+            </div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h5>Feature Engineering</h5>
+              <p>Lag features, rolling avg, seasonal indicators</p>
+            </div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h5>Model Training</h5>
+              <p>Train 4 โมเดล: LR, DT, RF, XGBoost</p>
+            </div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h5>Evaluation</h5>
+              <p>R², MAE, RMSE บน Test Set</p>
+            </div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-number">6</div>
+            <div class="step-content">
+              <h5>Deployment</h5>
+              <p>Real-time dashboard + API</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. การจัดเก็บรหัสโค้ดและเอกสาร (Git/ระบบ) — โครงสร้าง GitHub -->
+      <div class="repo-structure-card animate-on-scroll" style="margin-top: 28px;" id="repoStructure">
+        <div class="repo-card-header">
+          <div class="repo-header-left">
+            <div class="repo-badge-git"><i class="fab fa-github"></i> Git & Version Control</div>
+            <h3 class="repo-title">3. การจัดเก็บรหัสโค้ดและเอกสาร (Git/ระบบ)</h3>
+            <p class="repo-subtitle">โครงสร้างโปรเจกต์บน GitHub แบ่งสัดส่วนตามมาตรฐานสากล: ชุดข้อมูล (dataset/), แบบจำลองปัญญาประดิษฐ์ (ml_models/), และระบบเว็บแอปพลิเคชัน (web/)</p>
+          </div>
+          <div class="repo-header-actions">
+            <div class="repo-git-info">
+              <span class="git-tag"><i class="fas fa-code-branch"></i> main</span>
+              <span class="git-tag"><i class="fas fa-tag"></i> v2.0.0-release</span>
+              <span class="git-tag license"><i class="fas fa-balance-scale"></i> MIT License</span>
+            </div>
+            <div class="git-clone-box">
+              <code>git clone https://github.com/airguard-ai/airguard-platform.git</code>
+              <button class="btn-copy-repo" onclick="copyRepoClone(this)" title="คัดลอกคำสั่ง Git Clone">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tree & Modules Grid -->
+        <div class="repo-grid">
+          <!-- Left: Visual Code Tree (Terminal / IDE look) -->
+          <div class="repo-tree-panel">
+            <div class="tree-panel-header">
+              <div class="mac-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="tree-panel-title"><i class="fas fa-folder-tree"></i> GitHub Directory Tree Architecture</div>
+              <span class="tree-badge">Git Tracked • Clean Code</span>
+            </div>
+            <pre class="repo-tree-code"><code><span class="tree-root"><i class="fab fa-github"></i> projast/</span>
+├── <span class="tree-dir highlight-dir"><i class="fas fa-folder text-warning"></i> dataset/</span>                   <span class="tree-comment"># รวมไฟล์ Excel ข้อมูลย้อนหลัง 5.5 ปี</span>
+│   ├── <span class="tree-file"><i class="fas fa-file-excel text-success"></i> 2021.xlsx</span>              <span class="tree-comment"># Air4Thai 105 สถานี ปี 2021 (180 KB)</span>
+│   ├── <span class="tree-file"><i class="fas fa-file-excel text-success"></i> 2022.xlsx</span>              <span class="tree-comment"># Air4Thai 105 สถานี ปี 2022 (195 KB)</span>
+│   ├── <span class="tree-file"><i class="fas fa-file-excel text-success"></i> 2023.xlsx</span>              <span class="tree-comment"># Air4Thai 105 สถานี ปี 2023 (168 KB)</span>
+│   ├── <span class="tree-file"><i class="fas fa-file-excel text-success"></i> 2024.xlsx</span>              <span class="tree-comment"># Air4Thai 105 สถานี ปี 2024 (124 KB)</span>
+│   ├── <span class="tree-file"><i class="fas fa-file-excel text-success"></i> 2025.xlsx</span>              <span class="tree-comment"># Air4Thai 105 สถานี ปี 2025 (111 KB)</span>
+│   ├── <span class="tree-file"><i class="fas fa-file-excel text-success"></i> 2026.xlsx</span>              <span class="tree-comment"># Air4Thai ปี 2026 ล่าสุด (64 KB)</span>
+│   └── <span class="tree-file"><i class="fas fa-file-lines text-muted"></i> data_dictionary.md</span>     <span class="tree-comment"># กำกับ Metadata 106 คอลัมน์</span>
+│
+├── <span class="tree-dir highlight-dir"><i class="fas fa-folder text-warning"></i> ml_models/</span>                 <span class="tree-comment"># สคริปต์โมเดล Python & ไฟล์ผลทดลอง</span>
+│   ├── <span class="tree-file"><i class="fas fa-file-code text-muted"></i> requirements.txt</span>       <span class="tree-comment"># Python dependencies (scikit-learn, xgboost)</span>
+│   ├── <span class="tree-file"><i class="fas fa-chart-pie text-secondary"></i> ml_results_5yr.json</span>    <span class="tree-comment"># บันทึกผล Benchmark 4 โมเดล 5.5 ปี</span>
+│   └── <span class="tree-file"><i class="fab fa-python text-primary"></i> train_models.py</span>        <span class="tree-comment"># สคริปต์เทรนและวัดผลโมเดล ML</span>
+│
+├── <span class="tree-file"><i class="fas fa-image text-info"></i> hero-bg.png</span>                 <span class="tree-comment"># กราฟิกหน้าเว็บหลัก (Root Directory)</span>
+├── <span class="tree-file"><i class="fab fa-html5 text-danger"></i> index.html</span>                  <span class="tree-comment"># หน้าเว็บหลัก รองรับ GitHub Pages ทันที</span>
+├── <span class="tree-file"><i class="fab fa-js text-warning"></i> script.js</span>                   <span class="tree-comment"># Open-Meteo Real-time API & Chart.js</span>
+├── <span class="tree-file"><i class="fab fa-css3-alt text-info"></i> style.css</span>                   <span class="tree-comment"># Design System, Responsive & Themes</span>
+└── <span class="tree-file"><i class="fas fa-book-open text-primary"></i> README.md</span>                  <span class="tree-comment"># คู่มือการติดตั้งและคำอธิบายระบบ</span></code></pre>
+          </div>
+
+          <!-- Right: Module Architecture Breakdown -->
+          <div class="repo-modules-list">
+            <!-- Card 1: dataset/ -->
+            <div class="repo-module-item">
+              <div class="repo-module-icon dataset-bg">
+                <i class="fas fa-database"></i>
+              </div>
+              <div class="repo-module-info">
+                <div class="module-title-row">
+                  <h4>📁 dataset/</h4>
+                  <span class="module-tag tag-data">Data Management</span>
+                </div>
+                <p>จัดเก็บข้อมูลปฐมภูมิจากกรมควบคุมมลพิษ (Air4Thai) ย้อนหลัง 5.5 ปี (2021–2026) ครอบคลุม 105 สถานี และชุดข้อมูลที่ผ่านการ Imputation เติมค่าสูญหายด้วยเทคนิค Linear Interpolation พร้อมไฟล์ Data Dictionary กำกับความหมายทุก Feature</p>
+                <div class="module-meta">
+                  <span><i class="fas fa-file-lines"></i> 6 ไฟล์หลัก (.xlsx, .csv)</span>
+                  <span><i class="fas fa-weight-hanging"></i> ~840 KB (รองรับ Git LFS)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: ml_models/ -->
+            <div class="repo-module-item">
+              <div class="repo-module-icon ml-bg">
+                <i class="fas fa-brain"></i>
+              </div>
+              <div class="repo-module-info">
+                <div class="module-title-row">
+                  <h4>📁 ml_models/</h4>
+                  <span class="module-tag tag-ml">AI & Benchmarks</span>
+                </div>
+                <p>สคริปต์สำหรับการทดลองและคัดเลือกโมเดล (Model Selection): Linear Regression, Decision Tree, Random Forest, Gradient Boosting/XGBoost บันทึกค่า Model Weights (.pkl) และสคริปต์คำนวณ Error Metrics (R², MAE, RMSE) บน Test Set</p>
+                <div class="module-meta">
+                  <span><i class="fas fa-laptop-code"></i> Python 3.10+ / Scikit-Learn / XGBoost</span>
+                  <span><i class="fas fa-award"></i> Best Model: XGBoost (Peak Acc 62.2%)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: web/ -->
+            <div class="repo-module-item">
+              <div class="repo-module-icon web-bg">
+                <i class="fas fa-globe"></i>
+              </div>
+              <div class="repo-module-info">
+                <div class="module-title-row">
+                  <h4>📁 web/</h4>
+                  <span class="module-tag tag-web">Production Frontend</span>
+                </div>
+                <p>ระบบเว็บแอปพลิเคชัน AirGuard AI สำหรับผู้ใช้งานจริง เชื่อมต่อ Live Open-Meteo Realtime API พยากรณ์อากาศ 7 วันล่วงหน้า ระบบประเมินความเสี่ยงรายบุคคล (Personalized Alert) และแดชบอร์ด Benchmark พร้อมรองรับ Dark/Light Mode</p>
+                <div class="module-meta">
+                  <span><i class="fab fa-js"></i> Vanilla JS + Chart.js + CSS Glassmorphism</span>
+                  <span><i class="fas fa-mobile-screen"></i> 100% Fully Responsive</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Git System & CI/CD -->
+            <div class="repo-module-item">
+              <div class="repo-module-icon git-bg">
+                <i class="fab fa-git-alt"></i>
+              </div>
+              <div class="repo-module-info">
+                <div class="module-title-row">
+                  <h4>⚡ การจัดเก็บเอกสาร & Git Workflow</h4>
+                  <span class="module-tag tag-git">Version Control & Docs</span>
+                </div>
+                <p>ควบคุมการเปลี่ยนแปลงโค้ดผ่าน Git Version Control มีการแบ่ง Branch ชัดเจน (main, develop, feature/*) พร้อมโฟลเดอร์ <code>docs/</code> บันทึกรายงานผลการศึกษา คู่มือสเปก API สำหรับระดับองค์กร และไฟล์ README.md สรุปวิธีรันอย่างครบถ้วน</p>
+                <div class="module-meta">
+                  <span><i class="fas fa-shield-halved"></i> Main Branch Protected</span>
+                  <span><i class="fas fa-file-pdf"></i> Academic Report & Docs Included</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- ===== ENTERPRISE / PRICING PAGE ===== -->
+  <!-- ========================================================= -->
+  <section class="page-section" id="pricing">
+    <div class="section-container">
+      <div class="section-header animate-on-scroll">
+        <div class="section-badge"><i class="fas fa-building"></i> Enterprise Solutions</div>
+        <h2 class="section-title">แพ็กเกจและโซลูชัน</h2>
+        <p class="section-subtitle">เลือกแพ็กเกจที่เหมาะกับคุณ — ตั้งแต่ใช้งานส่วนตัวฟรีไปจนถึงระบบองค์กร</p>
+      </div>
+
+      <div class="pricing-grid animate-on-scroll">
+        <!-- Free Tier -->
+        <div class="pricing-card">
+          <div class="pricing-tier-badge free">Free</div>
+          <div class="pricing-icon"><i class="fas fa-leaf"></i></div>
+          <h3 class="pricing-name">Basic Dashboard</h3>
+          <div class="pricing-price">
+            <span class="pricing-amount">ฟรี</span>
+            <span class="pricing-period">ตลอดชีพ</span>
+          </div>
+          <p class="pricing-desc">เริ่มต้นใช้งานได้ทันที ไม่มีค่าใช้จ่าย</p>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> Web Dashboard แบบ Real-time</li>
+            <li><i class="fas fa-check"></i> ข้อมูลย้อนหลัง 5.5 ปี</li>
+            <li><i class="fas fa-check"></i> ML Prediction (XGBoost)</li>
+            <li><i class="fas fa-check"></i> 7-Day Forecast</li>
+            <li><i class="fas fa-check"></i> Personalized Risk Alert</li>
+            <li class="disabled"><i class="fas fa-times"></i> LINE Alert ส่วนตัว</li>
+            <li class="disabled"><i class="fas fa-times"></i> API Access</li>
+            <li class="disabled"><i class="fas fa-times"></i> Multi-location Monitor</li>
+          </ul>
+          <button class="btn-pricing free" onclick="alert('🎉 คุณกำลังใช้แพ็กเกจ Free อยู่แล้ว!')">
+            <i class="fas fa-rocket"></i> ใช้งานฟรี
+          </button>
+        </div>
+
+        <!-- Pro Individual -->
+        <div class="pricing-card featured">
+          <div class="pricing-popular">POPULAR</div>
+          <div class="pricing-tier-badge pro">Pro</div>
+          <div class="pricing-icon"><i class="fas fa-bolt"></i></div>
+          <h3 class="pricing-name">Pro Individual</h3>
+          <div class="pricing-price">
+            <span class="pricing-currency">฿</span>
+            <span class="pricing-amount">299</span>
+            <span class="pricing-period">/ เดือน</span>
+          </div>
+          <p class="pricing-desc">สำหรับคนที่ต้องการการแจ้งเตือนส่วนตัวผ่าน LINE</p>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> ทุกอย่างใน Free</li>
+            <li class="highlight"><i class="fas fa-check"></i> <strong>LINE Alert ส่วนตัวรายวัน</strong></li>
+            <li class="highlight"><i class="fas fa-check"></i> <strong>แจ้งเตือนล่วงหน้า 24 ชม.</strong></li>
+            <li><i class="fas fa-check"></i> Personalized Risk Report</li>
+            <li><i class="fas fa-check"></i> Priority Support</li>
+            <li class="disabled"><i class="fas fa-times"></i> API Access</li>
+            <li class="disabled"><i class="fas fa-times"></i> Multi-location Monitor</li>
+            <li class="disabled"><i class="fas fa-times"></i> Campus Dashboard</li>
+          </ul>
+          <button class="btn-pricing pro" onclick="alert('📱 ระบบ LINE Alert กำลังพัฒนา — เปิดให้ลงทะเบียนเร็วๆ นี้!')">
+            <i class="fab fa-line"></i> เริ่มใช้งาน Pro
+          </button>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="pricing-card">
+          <div class="pricing-tier-badge enterprise">Enterprise</div>
+          <div class="pricing-icon"><i class="fas fa-city"></i></div>
+          <h3 class="pricing-name">Enterprise / School</h3>
+          <div class="pricing-price">
+            <span class="pricing-amount">ติดต่อ</span>
+            <span class="pricing-period">ทีมขาย</span>
+          </div>
+          <p class="pricing-desc">ระบบ Monitor สำหรับโรงเรียน, มหาวิทยาลัย, สำนักงาน</p>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> ทุกอย่างใน Pro</li>
+            <li class="highlight"><i class="fas fa-check"></i> <strong>Campus Dashboard</strong></li>
+            <li class="highlight"><i class="fas fa-check"></i> <strong>Developer API Access</strong></li>
+            <li class="highlight"><i class="fas fa-check"></i> <strong>Multi-location Monitor</strong></li>
+            <li><i class="fas fa-check"></i> ระบบแจ้งเตือนอัตโนมัติ</li>
+            <li><i class="fas fa-check"></i> Custom Branding</li>
+            <li><i class="fas fa-check"></i> SLA & Dedicated Support</li>
+            <li><i class="fas fa-check"></i> Data Export & Analytics</li>
+          </ul>
+          <button class="btn-pricing enterprise" onclick="alert('📧 ส่งอีเมลถึง airguard@kku.ac.th เพื่อสอบถามรายละเอียด')">
+            <i class="fas fa-envelope"></i> ติดต่อทีมขาย
+          </button>
+        </div>
+      </div>
+
+      <!-- Use Cases -->
+      <div class="use-cases-grid animate-on-scroll">
+        <div class="use-case-card">
+          <div class="use-case-icon"><i class="fas fa-school"></i></div>
+          <h4>โรงเรียน & มหาวิทยาลัย</h4>
+          <p>ติดตั้ง Dashboard แสดงผลหน้าจอ LED ในโรงเรียน แจ้งเตือนอัตโนมัติเมื่อ PM2.5 เกินค่ามาตรฐาน ปกป้องนักเรียนและบุคลากร</p>
+        </div>
+        <div class="use-case-card">
+          <div class="use-case-icon"><i class="fas fa-building"></i></div>
+          <h4>อาคารสำนักงาน</h4>
+          <p>Monitor คุณภาพอากาศทั้งภายในและภายนอกอาคาร ส่งสัญญาณควบคุมระบบกรองอากาศอัตโนมัติ</p>
+        </div>
+        <div class="use-case-card">
+          <div class="use-case-icon"><i class="fas fa-code"></i></div>
+          <h4>Developer API</h4>
+          <p>RESTful API สำหรับดึงข้อมูล PM2.5, prediction, และ health risk ไปใช้ในแอปของคุณเอง</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- ===== FOOTER ===== -->
+  <!-- ========================================================= -->
+  <footer class="footer-main">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <!-- About -->
+        <div class="footer-col">
+          <div class="footer-brand">
+            <div class="nav-brand-icon" style="width:32px;height:32px;font-size:0.9rem;"><i class="fas fa-wind"></i></div>
+            <span style="font-weight:700;font-size:1.05rem;">AirGuard <span class="text-gradient">AI</span></span>
+          </div>
+          <p class="footer-about-text">
+            AI-powered PM2.5 prediction and health risk alert system. 
+            Built with advanced ML models trained on 5.5 years of real Air4Thai data.
+          </p>
+        </div>
+        <!-- Quick Links -->
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#home" onclick="navigateTo('home')">Home</a></li>
+            <li><a href="#alert" onclick="navigateTo('alert')">Personalized Alert</a></li>
+            <li><a href="#forecast" onclick="navigateTo('forecast')">7-Day Forecast</a></li>
+            <li><a href="#benchmark" onclick="navigateTo('benchmark')">ML & Benchmark</a></li>
+            <li><a href="#pricing" onclick="navigateTo('pricing')">Enterprise / Pricing</a></li>
+          </ul>
+        </div>
+        <!-- Team -->
+        <div class="footer-col">
+          <h4>Project Team</h4>
+          <ul>
+            <li><span>👨‍💻 Member 1 — Lead Developer & ML</span></li>
+            <li><span>👩‍💻 Member 2 — Data Analyst</span></li>
+            <li><span>👨‍🔬 Member 3 — Frontend & UX</span></li>
+          </ul>
+        </div>
+        <!-- University -->
+        <div class="footer-col">
+          <h4>University</h4>
+          <div class="footer-uni">
+            <i class="fas fa-university" style="font-size:1.5rem;color:var(--primary-400);margin-bottom:8px;"></i>
+            <strong>Khon Kaen University</strong>
+            <span>Nong Khai Campus</span>
+            <span style="font-size:0.78rem;color:var(--text-tertiary);">Faculty of Science and Arts · Data Science</span>
+          </div>
+          <div style="margin-top:12px;">
+            <a href="http://air4thai.pcd.go.th" target="_blank" class="footer-link-ext">
+              <i class="fas fa-external-link-alt"></i> Air4Thai (PCD)
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 <strong>AirGuard AI</strong> — Machine Learning-Based PM2.5 Prediction System · Khon Kaen University, Nong Khai Campus</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
